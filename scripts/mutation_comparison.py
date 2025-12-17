@@ -7,21 +7,21 @@ import numpy as np
 from matplotlib.colors import ListedColormap
 from matplotlib.patches import Patch
 
-# ---------- User input ----------
-aligned_fasta = "aligned3.fasta"        # your MSA with all sequences
-consensus_fasta = "20A_consensus.fasta" # precomputed 20A consensus
-threshold = 0.01                        # frequency threshold for mutations
-# --------------------------------
 
-# Load 20A consensus as reference
+aligned_fasta = "aligned3.fasta"        
+consensus_fasta = "20A_consensus.fasta" 
+threshold = 0.01                        
+
+
+# Load 20A 
 consensus_record = next(SeqIO.parse(consensus_fasta, "fasta"))
 ref_seq = str(consensus_record.seq)
 print(f"Loaded consensus reference: {consensus_record.id}, length={len(ref_seq)}")
 
-# Read aligned sequences
+# Read sequences
 records = list(SeqIO.parse(aligned_fasta, "fasta"))
 
-# Extract sequences per lineage
+# sequences per lineage
 seqs_20A = [str(rec.seq) for rec in records if "20A" in rec.description]
 seqs_22C = [str(rec.seq) for rec in records if "22C" in rec.description]
 seqs_21J = [str(rec.seq) for rec in records if "21J" in rec.description]
@@ -30,9 +30,8 @@ print(f"Loaded {len(seqs_20A)} sequences of 20A")
 print(f"Loaded {len(seqs_22C)} sequences of 22C")
 print(f"Loaded {len(seqs_21J)} sequences of 21J")
 
-# ---------- Functions ----------
+
 def aa_frequencies(seqs):
-    """Compute amino acid frequencies per position for a set of sequences."""
     freq_table = []
     seq_len = len(seqs[0])
     for i in range(seq_len):
@@ -50,7 +49,7 @@ def difference_matrix_all_freq(ref_seq, freqs_20A, freqs_22C, freqs_21J, thresho
     aa_matrix = np.empty((4, positions), dtype="<U30")
     color_matrix = np.zeros((4, positions))
 
-    # Row 0 = consensus reference
+    # Row 0 is consensus reference
     aa_matrix[0, :] = list(ref_seq)
     color_matrix[0, :] = 0
 
@@ -77,17 +76,17 @@ def difference_matrix_all_freq(ref_seq, freqs_20A, freqs_22C, freqs_21J, thresho
 
     return color_matrix[:, diff_positions], aa_matrix[:, diff_positions], lineages, diff_positions + 1
 
-# Compute amino acid frequencies
+# Compute frequencies
 freqs_20A = aa_frequencies(seqs_20A)
 freqs_22C = aa_frequencies(seqs_22C)
 freqs_21J = aa_frequencies(seqs_21J)
 
-# Generate heatmap matrices
+# heatmap matrices
 color_matrix, aa_matrix, lineages, trimmed_positions = difference_matrix_all_freq(
     ref_seq, freqs_20A, freqs_22C, freqs_21J, threshold=threshold
 )
 
-# ---------- Plot heatmap ----------
+
 if color_matrix is not None:
     cmap = ListedColormap([
         "#f0f0f0",  # 0 - no mutation
