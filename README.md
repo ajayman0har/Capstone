@@ -4,7 +4,7 @@ Comparative analysis of ~5,600 SARS-CoV-2 Nucleocapsid (N) protein sequences acr
 
 *VCU Bioinformatics Capstone*
 
-![N-protein mutations vs. 20A consensus](scripts/N_lineage_vs_20A_consensus_heatmap.png)
+
 
 ## Key Findings
 - Identified **5 convergent N-protein mutations** arising independently across lineages
