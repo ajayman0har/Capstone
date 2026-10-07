@@ -1,50 +1,47 @@
-SARS‑CoV‑2 Nucleocapsid Mutation Comparator
+# SARS-CoV-2 Nucleocapsid Mutation Analysis
 
-Comparing Mutations in the SARS‑CoV‑2 Nucleocapsid Protein
+Comparative analysis of ~5,600 SARS-CoV-2 Nucleocapsid (N) protein sequences across three lineages — ancestral B.1 (20A), Delta (21J), and Omicron BA.2 — to identify convergent mutations and assess their potential impact on antigen test sensitivity.
 
-This repository contains a project analyzing mutations in the SARS‑CoV‑2 nucleocapsid (N) protein. The goal is to identify and compare mutations across viral isolates to better understand variation in this key viral protein.
+*VCU Bioinformatics Capstone*
 
+![N-protein mutations vs. 20A consensus](scripts/N_lineage_vs_20A_consensus_heatmap.png)
 
-Overview
+## Key Findings
+- Identified **5 convergent N-protein mutations** arising independently across lineages
+- Mapped these mutations to **B-cell epitope regions** targeted by antigen tests
 
-The SARS‑CoV‑2 nucleocapsid protein (N) is important for viral RNA packaging and interactions with the host immune system. Studying mutations in this protein can help researchers:
+## Pipeline
+| Step | Script | Description |
+|------|--------|-------------|
+| 1 | `fetch_genomes_20A_21J_22C.py` | Queries NCBI Nucleotide for up to 2,000 records per lineage, extracts N-protein translations (≥300 aa, no ambiguous residues), and writes a FASTA plus metadata CSV |
+| 2 | MAFFT | Protein multiple sequence alignment → `aligned3.fasta` |
+| 3 | `consensus.py` | Builds a majority-rule 20A consensus (excluding sequences >50% gaps) as the ancestral baseline → `20A_consensus.fasta` |
+| 4 | `mutation_comparison.py` | Computes per-lineage amino-acid frequencies, flags substitutions vs. the 20A consensus at ≥1% frequency, and plots a frequency heatmap |
 
-Track variant emergence
+Lineages are assigned by NCBI search terms (Pango designations in record metadata), not by re-classification with Pangolin/Nextclade.
 
-Correlate mutations with clinical or epidemiological trends
+## Tech Stack
+Python · Biopython · MAFFT · Pandas · NumPy · Matplotlib · Seaborn
 
-Improve diagnostics targeting the N protein
-
-This project was developed as a capstone to demonstrate bioinformatics and data analysis skills.
-
-
-Motivation
-
-Understanding the mutation patterns in the N protein can provide insights into viral evolution, assist in diagnostic design, and highlight areas for further research.
-
-
-Getting Started
-
-Since the repository currently contains only the README, next steps include:
-
-Adding data files (FASTA, CSV, or other formats) for analysis.
-
-Adding analysis scripts (Python, R, or Jupyter notebooks) to process the sequences.
-
-Adding results (tables, plots, or summaries) for visualization and comparison.
-
-Once the files are added, you can:
-
+## Usage
+```bash
 git clone https://github.com/ajayman0har/Capstone.git
-cd Capstone
+cd Capstone/scripts
+pip install biopython pandas numpy matplotlib seaborn
+# MAFFT must be installed separately: https://mafft.cbrc.jp/alignment/software/
+# Set your own email in fetch_genomes_20A_21J_22C.py (required by NCBI Entrez)
 
-…and run the analysis as specified in future scripts.
+python fetch_genomes_20A_21J_22C.py
+mafft --auto sarscov2_N_proteins_20A_21J_22C_subset.fasta > aligned3.fasta
+python consensus.py
+python mutation_comparison.py
+```
 
+To skip fetching and alignment, run the last two commands on the included `aligned3.fasta`.
 
-License
+## Output
+- `20A_consensus.fasta`: ancestral N-protein consensus
+- `N_lineage_vs_20A_consensus_heatmap.png`: substitutions per lineage, colored by frequency
 
-This project is distributed under the MIT License. See LICENSE for details.
-
-Contact
-
-Created by Ajay Manohar — open to feedback or collaboration!
+## License
+MIT
